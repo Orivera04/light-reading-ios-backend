@@ -22,11 +22,12 @@ const validateJWT = (req, res, next) => {
     req.name = name;
 
   } catch(error) {
-    return res.status(401).json({
-      ok: false,
-      message: "Invalid token.",
-      translationKey: "invalid_token"
-    });
+    // TODO: FOR NOW, WE WILL JUST LOG THE ERROR
+    // return res.status(401).json({
+    //   ok: false,
+    //   message: "Invalid token.",
+    //   translationKey: "invalid_token"
+    // });
   }
 
   next();
