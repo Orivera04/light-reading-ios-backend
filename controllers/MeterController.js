@@ -1,4 +1,5 @@
 const Meter = require('../models/Meter');
+const Reading = require('../models/Reading');
 
 const getAllMeters = async (req, res) => {
   try {
@@ -17,8 +18,25 @@ const getMeterById = async (req, res) => {
   const userId = req.uid;
 
   try {
-    const meter = await Meter.find({ _id: id, user: userId });
-    return res.json({ ok: true, meter });
+    const meterData = await Meter.findOne({ _id: id, user: userId })
+                                 .select('name currentReading readings')
+                                 .populate('readings', 'KwhReading dateOfReading');
+
+    const lastCutOffReadingRecord = await Reading.findOne({ meter: id, isCutoffDate: true })
+                                                 .sort({ dateOfReading: -1 })
+                                                 .select('KwhReading dateOfReading');
+
+    const secondLastCutOffReadingRecord = await Reading.findOne({ meter: id, isCutoffDate: true })
+                                                       .sort({ dateOfReading: -1 })
+                                                       .skip(1)
+                                                       .select('KwhReading dateOfReading');
+
+    const readingData = {
+        lastInvoice: lastCutOffReadingRecord.dateOfReading,
+        lastReading: (lastCutOffReadingRecord?.KwhReading - secondLastCutOffReadingRecord?.KwhReading) || 0,
+    };
+
+    return res.json({ ok: true, meter: { ...meterData.toObject(), ...readingData } });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ ok: false, message: 'Please, talk to the administrator.', translationKey: "talk_to_admin" });
@@ -71,7 +89,7 @@ const updateMeter = async (req, res ) => {
       ...req.body
     }
 
-    const updatedMeter = await Meter.findByIdAndUpdate(meterId, newMeter, { new: true });
+    await Meter.findByIdAndUpdate(meterId, newMeter, { new: true });
 
     return res.json({
       ok: true,
