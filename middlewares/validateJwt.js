@@ -21,7 +21,7 @@ const validateJWT = (req, res, next) => {
     // req.uid = uid;
     // req.name = name;
 
-    req.uid = "65d926131c1d403f4e37b1d7"
+    req.uid = "65da81e076ef278705af1562"
     req.name = "Oscar"
 
   } catch(error) {
