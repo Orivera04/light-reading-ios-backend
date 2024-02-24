@@ -34,7 +34,7 @@ const getMeterById = async (req, res) => {
                                                        .select('KwhReading dateOfReading');
 
     const readingData = {
-        lastInvoice: lastCutOffReadingRecord?.dateOfReading,
+        lastInvoice: lastCutOffReadingRecord?.dateOfReading || null,
         lastReading: (lastCutOffReadingRecord?.KwhReading - secondLastCutOffReadingRecord?.KwhReading) || 0,
     };
 
