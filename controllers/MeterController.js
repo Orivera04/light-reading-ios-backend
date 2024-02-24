@@ -5,7 +5,7 @@ const getAllMeters = async (req, res) => {
   try {
     const userId = req.uid;
     const meters = await Meter.find({ user: userId })
-                              .select('id name tag desiredKwhMonthly currentReading');;
+                              .select('id name tag desiredKwhMonthly currentReading');
     return res.json({ ok: true, meters });
   } catch (error) {
     console.log(error);
@@ -19,8 +19,10 @@ const getMeterById = async (req, res) => {
 
   try {
     const meterData = await Meter.findOne({ _id: id, user: userId })
-                                 .select('name desiredKwhMonthly currentReading readings')
+                                 .select('id name desiredKwhMonthly currentReading readings')
                                  .populate('readings', 'KwhReading dateOfReading');
+
+    meterData.id = meterData._id;
 
     const lastCutOffReadingRecord = await Reading.findOne({ meter: id, isCutoffDate: true })
                                                  .sort({ dateOfReading: -1 })
