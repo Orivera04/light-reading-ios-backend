@@ -79,7 +79,7 @@ const updateMeter = async (req, res ) => {
       });
     }
 
-    if (meter.user.toString() !== uid) {
+    if (meter.user.toString() !== userId) {
       return res.status(401).json({
         ok: false,
         message: 'you dont have the privilege to update this meter.',
