@@ -1,6 +1,10 @@
 const { Schema, model } = require('mongoose');
 
 const MeterSchema = Schema({
+  id: {
+    type: String,
+    required: true
+  },
   name: {
     type: String,
     required: true
@@ -26,13 +30,6 @@ const MeterSchema = Schema({
     ref: 'User',
     required: true
   }
-});
-
-// Use a method to remove the __v and _id from the object returned
-MeterSchema.method('toJSON', function() {
-  const { __v, _id, ...Object } = this.toObject();
-  Object.id = _id;
-  return Object;
 });
 
 module.exports = model('Meter', MeterSchema);

@@ -2,6 +2,10 @@ const { Schema, model } = require('mongoose');
 const Meter = require('../models/Meter');
 
 const ReadingSchema = Schema({
+  id: {
+    type: String,
+    required: true
+  },
   KwhReading: {
     type: Number,
     required: true
@@ -19,13 +23,6 @@ const ReadingSchema = Schema({
     ref: 'Meter',
     required: true
   }
-});
-
-// Use a method to remove the __v and _id from the object returned
-ReadingSchema.method('toJSON', function() {
-  const { __v, _id, ...Object } = this.toObject();
-  Object.id = _id;
-  return Object;
 });
 
 // Indexs
