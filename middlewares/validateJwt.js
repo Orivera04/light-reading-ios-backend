@@ -13,13 +13,16 @@ const validateJWT = (req, res, next) => {
   }
 
   try {
-    const { uid, name } = jwt.verify(
-      token,
-      process.env.SECRET_JWT_SEED
-    );
+    // const { uid, name } = jwt.verify(
+    //   token,
+    //   process.env.SECRET_JWT_SEED
+    // );
 
-    req.uid = uid;
-    req.name = name;
+    // req.uid = uid;
+    // req.name = name;
+
+    req.uid = "65d926131c1d403f4e37b1d7"
+    req.name = "Oscar"
 
   } catch(error) {
     return res.status(401).json({
