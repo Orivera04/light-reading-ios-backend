@@ -21,6 +21,13 @@ const ReadingSchema = Schema({
   }
 });
 
+// Use a method to remove the __v and _id from the object returned
+ReadingSchema.method('toJSON', function() {
+  const { __v, _id, ...Object } = this.toObject();
+  Object.id = _id;
+  return Object;
+});
+
 // Indexs
 ReadingSchema.index({ meter: 1, dateOfReading: 1 }, { unique: true });
 
