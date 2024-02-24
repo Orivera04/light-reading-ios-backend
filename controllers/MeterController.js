@@ -3,7 +3,8 @@ const Meter = require('../models/Meter');
 const getAllMeters = async (req, res) => {
   try {
     const userId = req.uid;
-    const meters = await Meter.find({ user: userId });
+    const meters = await Meter.find({ user: userId })
+                              .select('id name tag desiredKwhMonthly currentReading');;
     return res.json({ ok: true, meters });
   } catch (error) {
     console.log(error);
