@@ -11,7 +11,8 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "program": "${workspaceFolder}/index.js"
+      "program": "${workspaceFolder}/index.js",
+      "runtimeExecutable": "/Users/orivera04/.nvm/versions/node/v20.0.0/bin/node",
     }
   ]
 }

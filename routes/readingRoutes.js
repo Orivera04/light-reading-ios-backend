@@ -13,7 +13,7 @@ router.get('/:id', getReadingById);
 router.post('/', [
   check('KwhReading', 'The KWH reading is needed.').not().isEmpty(),
   check('dateOfReading', 'The date of reading is needed.').not().isEmpty(),
-  check('isLastCycle', 'The isLastCycle is needed.').not().isEmpty(),
+  check('isCutoffDate', 'The isCutoffDate is needed.').not().isEmpty(),
   check('meter', 'The meter is needed.').not().isEmpty(),
   validateFields
 ], createReading );

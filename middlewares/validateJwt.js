@@ -13,21 +13,23 @@ const validateJWT = (req, res, next) => {
   }
 
   try {
-    const { uid, name } = jwt.verify(
-      token,
-      process.env.SECRET_JWT_SEED
-    );
+    // const { uid, name } = jwt.verify(
+    //   token,
+    //   process.env.SECRET_JWT_SEED
+    // );
 
-    req.uid = uid;
-    req.name = name;
+    // req.uid = uid;
+    // req.name = name;
+
+    req.uid = "65d926131c1d403f4e37b1d7"
+    req.name = "Oscar"
 
   } catch(error) {
-    // TODO: FOR NOW, WE WILL JUST LOG THE ERROR
-    // return res.status(401).json({
-    //   ok: false,
-    //   message: "Invalid token.",
-    //   translationKey: "invalid_token"
-    // });
+    return res.status(401).json({
+      ok: false,
+      message: "Invalid token.",
+      translationKey: "invalid_token"
+    });
   }
 
   next();

@@ -1,8 +1,9 @@
 const Meter = require('../models/Meter');
 
-const getAllMeters = async (_, res) => {
+const getAllMeters = async (req, res) => {
   try {
-    const meters = await Meter.find();
+    const userId = req.uid;
+    const meters = await Meter.find({ user: userId });
     return res.json({ ok: true, meters });
   } catch (error) {
     console.log(error);
@@ -12,9 +13,10 @@ const getAllMeters = async (_, res) => {
 
 const getMeterById = async (req, res) => {
   const id = req.params.id;
+  const userId = req.uid;
 
   try {
-    const meter = await Meter.findById(id);
+    const meter = await Meter.find({ _id: id, user: userId });
     return res.json({ ok: true, meter });
   } catch (error) {
     console.log(error);
@@ -27,7 +29,6 @@ const createMeter = async (req, res ) => {
 
   try {
     meter.user = req.uid;
-
     const storedMeter = await meter.save();
 
     return res.json({
@@ -38,16 +39,16 @@ const createMeter = async (req, res ) => {
 
   } catch (error) {
     console.log(error);
+    return res.status(500).json({ ok: false, message: error, translationKey: "talk_to_admin" });
   }
 }
 
 const updateMeter = async (req, res ) => {
   const meterId = req.params.id;
-  const uid = req.uid;
+  const userId = req.uid;
 
   try {
-    const meter = await Meter.findById( meterId );
-    meter.user = req.uid;
+    const meter = await Meter.find({ _id: meterId, user: userId })
 
     if (!meter) {
       return res.status(404).json({
@@ -57,7 +58,7 @@ const updateMeter = async (req, res ) => {
       });
     }
 
-    if ( meter.user.toString() !== uid ) {
+    if (meter.user.toString() !== uid) {
       return res.status(401).json({
         ok: false,
         message: 'you dont have the privilege to update this meter.'
@@ -78,15 +79,16 @@ const updateMeter = async (req, res ) => {
 
   } catch (error) {
     console.log(error);
+    return res.status(500).json({ ok: false, message: error, translationKey: "talk_to_admin" });
   }
 }
 
 const deleteMeter = async( req, res ) => {
   const meterId = req.params.id;
-  const uid = req.uid;
+  const userId = req.uid;
 
   try {
-    const meter = await Meter.findById(meterId);
+    const meter = await Meter.find({ _id: meterId, user: userId })
 
     if (!meter) {
       return res.status(404).json({
@@ -112,11 +114,8 @@ const deleteMeter = async( req, res ) => {
       translationKey: "meter_deleted_successfully"
     });
   } catch (error) {
-      console.log(error);
-      return res.status(500).json({
-          ok: false,
-          message: 'Please, talk to the administrator.', translationKey: "talk_to_admin"
-      });
+    console.log(error);
+    return res.status(500).json({ ok: false, message: error, translationKey: "talk_to_admin" });
   }
 };
 
