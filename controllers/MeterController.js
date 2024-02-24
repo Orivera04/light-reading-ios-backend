@@ -6,7 +6,7 @@ const getAllMeters = async (req, res) => {
     const userId = req.uid;
     const meters = await Meter.find({ user: userId })
                               .select('id name tag desiredKwhMonthly currentReading');
-    return res.json({ ok: true, meters });
+    return res.json({ meters });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ ok: false, message: 'Please, talk to the administrator.', translationKey: "talk_to_admin" });
@@ -38,7 +38,7 @@ const getMeterById = async (req, res) => {
         lastReading: (lastCutOffReadingRecord?.KwhReading - secondLastCutOffReadingRecord?.KwhReading) || 0,
     };
 
-    return res.json({ ok: true, meter: { ...meterData.toObject(), ...readingData } });
+    return res.json( { ...meterData.toObject(), ...readingData } );
   } catch (error) {
     console.log(error);
     return res.status(500).json({ ok: false, message: 'Please, talk to the administrator.', translationKey: "talk_to_admin" });
