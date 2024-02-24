@@ -21,5 +21,5 @@ app.use('/api/v1/readings', require('./routes/readingRoutes'));
 
 
 app.listen(process.env.PORT, () => {
-  console.log(`Servidor corriendo en puerto ${ process.env.PORT }`);
+  console.log(`Server running on port: ${ process.env.PORT }`);
 });

@@ -30,11 +30,11 @@ const createMeter = async (req, res ) => {
 
   try {
     meter.user = req.uid;
-    const storedMeter = await meter.save();
+    await meter.save();
 
     return res.json({
       ok: true,
-      storedMeter,
+      message: 'Meter saved successfully.',
       translationKey: "meter_saved_successfully"
     });
 
@@ -75,7 +75,7 @@ const updateMeter = async (req, res ) => {
 
     return res.json({
       ok: true,
-      meter: updatedMeter,
+      message: 'Meter updated successfully.',
       translationKey: "meter_updated_succesfully"
     });
 
