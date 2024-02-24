@@ -13,11 +13,16 @@ router.get('/:id', getMeterById);
 router.post('/', [
   check('name', 'The name is needed.').not().isEmpty(),
   check('tag', 'The tag is needed.').not().isEmpty(),
-  check('lastBillingKwh', 'The lastBillingKwh is needed.').not().isEmpty(),
+  check('desiredKwhMonthly', 'The desiredKwhMonthly is needed and must be a positive number.').not().isEmpty().isInt({ min: 0 }),
   validateFields
 ], createMeter );
 
-router.put('/:id', updateMeter);
+router.put('/:id', [
+  check('name', 'The name is needed.').not().isEmpty(),
+  check('tag', 'The tag is needed.').not().isEmpty(),
+  check('desiredKwhMonthly', 'The desiredKwhMonthly is needed and must be a positive number.').not().isEmpty().isInt({ min: 0 }),
+  validateFields
+], updateMeter);
 router.delete('/:id', deleteMeter);
 
 module.exports = router;

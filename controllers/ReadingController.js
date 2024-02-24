@@ -1,20 +1,26 @@
 const Reading = require('../models/Reading');
+const Meter = require('../models/Meter');
+const { dehumanizeString } = require('../helpers/utils');
 
-const getAllReadings = async (_, res) => {
+const getAllReadings = async (req, res) => {
   try {
-    const readings = await Reading.find();
+    const userId = req.uid;
+    const meters = await Meter.find({ user: userId }).select('_id');
+    const readings = await Reading.find({ meter: { $in: meters } }).sort({ dateOfReading: -1 });
     return res.json({ ok: true, readings });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ ok: false, message: 'Please, talk to the administrator.', translationKey: "talk_to_admin" });
+    return res.status(500).json({ ok: false, message: error, translationKey: "talk_to_admin" });
   }
 }
 
 const getReadingById = async (req, res) => {
   const id = req.params.id;
+  const userId = req.uid;
+  const meters = await Meter.find({ user: userId }).select('_id');
 
   try {
-    const reading = await Reading.findById(id);
+    const reading = await Reading.find({ _id: id, meter: { $in: meters } });
     return res.json({ ok: true, reading });
   } catch (error) {
     console.log(error);
@@ -36,6 +42,7 @@ const createReading = async (req, res ) => {
 
   } catch (error) {
     console.log(error);
+    return res.json({ ok: false, error: error.message, translationKey: dehumanizeString(error.message) });
   }
 }
 
@@ -67,6 +74,7 @@ const updateReading = async (req, res ) => {
 
   } catch (error) {
     console.log(error);
+    return res.json({ ok: true, error, translationKey: "reading_saved_successfully" });
   }
 }
 
@@ -94,10 +102,7 @@ const deleteReading = async( req, res ) => {
     });
   } catch (error) {
       console.log(error);
-      return res.status(500).json({
-          ok: false,
-          message: 'Please, talk to the administrator.', translationKey: "talk_to_admin"
-      });
+      return res.status(500).json({ ok: false, message: 'Please, talk to the administrator.', translationKey: "talk_to_admin" });
   }
 };
 
