@@ -4,13 +4,13 @@ const jwt = require('jsonwebtoken');
 const validateJWT = (req, res, next) => {
   const token = req.header('x-token');
 
-  if (!token){
-    return res.status(401).json({
-      ok: false,
-      message: "There is no token in the request.",
-      translationKey: "no_token_in_request"
-    });
-  }
+  // if (!token){
+  //   return res.status(401).json({
+  //     ok: false,
+  //     message: "There is no token in the request.",
+  //     translationKey: "no_token_in_request"
+  //   });
+  // }
 
   try {
     // const { uid, name } = jwt.verify(

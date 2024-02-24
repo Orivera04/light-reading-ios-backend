@@ -61,7 +61,8 @@ const updateMeter = async (req, res ) => {
     if (meter.user.toString() !== uid) {
       return res.status(401).json({
         ok: false,
-        message: 'you dont have the privilege to update this meter.'
+        message: 'you dont have the privilege to update this meter.',
+        translationKey: "no_privilege_to_update_meter"
       });
     }
 
@@ -98,7 +99,7 @@ const deleteMeter = async( req, res ) => {
       });
     }
 
-    if (meter.user.toString() !== uid ) {
+    if (meter.user.toString() !== userId ) {
       return res.status(401).json({
         ok: false,
         message: 'You dont have the privilege to delete this meter.',
