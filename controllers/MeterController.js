@@ -19,7 +19,7 @@ const getMeterById = async (req, res) => {
 
   try {
     const meterData = await Meter.findOne({ _id: id, user: userId })
-                                 .select('id name desiredKwhMonthly currentReading readings')
+                                 .select('id name desiredKwhMonthly currentReading tag readings')
                                  .populate('readings', 'KwhReading dateOfReading');
 
     meterData.id = meterData._id;
