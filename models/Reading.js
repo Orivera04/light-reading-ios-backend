@@ -9,6 +9,9 @@ const ReadingSchema = Schema({
     type: Number,
     required: true
   },
+  accumulatedkWhReading: {
+    type: Number
+  },
   dateOfReading: {
     type: Date,
     required: true,

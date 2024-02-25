@@ -18,13 +18,20 @@ const getMeterById = async (req, res) => {
   const userId = req.uid;
 
   try {
-    const meterData = await Meter.findOne({ _id: id, user: userId })
-                                 .select('id name desiredKwhMonthly currentReading tag readings')
-                                 .populate('readings', 'KwhReading dateOfReading');
+    let meterData = await Meter.findOne({ _id: id, user: userId })
+                               .select('id name desiredKwhMonthly currentReading tag readings')
+                               .populate('readings', 'KwhReading dateOfReading');
 
     const lastCutOffReadingRecord = await Reading.findOne({ meter: id, isCutoffDate: true })
                                                  .sort({ dateOfReading: -1 })
                                                  .select('KwhReading dateOfReading');
+
+    meterData.id = meterData._id;
+    meterData.readings = meterData.readings.map(reading => {
+      reading.id = reading._id;
+      reading.accumulatedkWhReading = reading.KwhReading - (lastCutOffReadingRecord?.KwhReading || 0);
+      return reading;
+    });
 
     const secondLastCutOffReadingRecord = await Reading.findOne({ meter: id, isCutoffDate: true })
                                                        .sort({ dateOfReading: -1 })
@@ -36,9 +43,7 @@ const getMeterById = async (req, res) => {
         lastReading: (lastCutOffReadingRecord?.KwhReading - secondLastCutOffReadingRecord?.KwhReading) || 0,
     };
 
-    meterData.id = meterData._id;
-
-    return res.json( { ...meterData.toObject(), ...readingData } );
+    return res.json({ ...meterData.toObject(), ...readingData });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ ok: false, message: 'Please, talk to the administrator.', translationKey: "talk_to_admin" });
