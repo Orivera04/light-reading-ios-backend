@@ -20,7 +20,7 @@ const getMeterById = async (req, res) => {
   try {
     let meterData = await Meter.findOne({ _id: id, user: userId })
                                .select('id name desiredKwhMonthly currentReading tag readings')
-                               .populate('readings', 'KwhReading dateOfReading meter');
+                               .populate('readings', 'KwhReading dateOfReading meter isCutoffDate');
 
     const lastCutOffReadingRecord = await Reading.findOne({ meter: id, isCutoffDate: true })
                                                  .sort({ dateOfReading: -1 })
