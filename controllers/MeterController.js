@@ -26,9 +26,7 @@ const getMeterById = async (req, res) => {
                                                  .sort({ dateOfReading: -1 })
                                                  .select('KwhReading dateOfReading');
 
-    meterData.id = meterData._id;
     meterData.readings = meterData.readings.map(reading => {
-      reading.id = reading._id;
       reading.accumulatedkWhReading = reading.KwhReading - (lastCutOffReadingRecord?.KwhReading || 0);
       return reading;
     });

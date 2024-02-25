@@ -31,12 +31,6 @@ const MeterSchema = Schema({
   }
 });
 
-MeterSchema.method('toJSON', function() {
-  const { __v, _id, ...Object } = this.toObject();
-  Object.id = _id;
-  return Object;
-});
-
 // Validations
 const validateBeforeDestroy = async function(record) {
   const readingExists = await record.model('Reading').findOne({ meter: record._id });
@@ -47,7 +41,6 @@ const validateBeforeDestroy = async function(record) {
 }
 
 // Events
-
 MeterSchema.pre('deleteOne', async function(next) {
   try {
     await validateBeforeDestroy(this);

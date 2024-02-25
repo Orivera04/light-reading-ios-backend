@@ -13,8 +13,8 @@ const ReadingSchema = Schema({
     type: Number
   },
   dateOfReading: {
-    type: Date,
-    required: true,
+    type: String,
+    required: true
   },
   isCutoffDate: {
     type: Boolean,
@@ -25,7 +25,7 @@ const ReadingSchema = Schema({
     ref: 'Meter',
     required: true
   }
-});
+}, { toJSON: { getters: true, virtuals: true } });
 
 // Indexs
 ReadingSchema.index({ meter: 1, dateOfReading: 1 }, { unique: true });
@@ -81,8 +81,21 @@ ReadingSchema.pre('validate', async function(next) {
   }
 });
 
+// Calculate the current kwh reading incluiding this reading
+ReadingSchema.pre('save', async function(next) {
+  try {
+    const lastCutOffRecord = await this.model('Reading').findOne({ meter: this.meter, isCutoffDate: true });
+
+    this.accumulatedkWhReading = (lastCutOffRecord?.KwhReading) ? this.KwhReading - lastCutOffRecord.KwhReading : 0;
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Store a new reading and update the meter's current reading
-ReadingSchema.post('save', async function(next) {
+ReadingSchema.post('save', async function(_, _ , next) {
   try {
     const meter = await Meter.findById(this.meter);
     const lastCutOffRecord = await this.model('Reading').findOne({ meter: this.meter, isCutoffDate: true });
