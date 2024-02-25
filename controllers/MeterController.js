@@ -23,9 +23,14 @@ const getMeterById = async (req, res) => {
                                .select('id name desiredKwhMonthly currentReading tag readings')
                                .populate('readings', 'KwhReading dateOfReading meter isCutoffDate');
 
+    const lastReadingRecord = await Reading.findOne({ meter: id })
+                                                 .sort({ dateOfReading: -1 })
+                                                 .select('KwhReading');
+
     const lastCutOffReadingRecord = await Reading.findOne({ meter: id, isCutoffDate: true })
                                                  .sort({ dateOfReading: -1 })
                                                  .select('KwhReading dateOfReading');
+
 
     meterData.readings = meterData.readings.map(reading => {
       reading.accumulatedkWhReading = reading.KwhReading - (lastCutOffReadingRecord?.KwhReading || 0);
@@ -40,6 +45,7 @@ const getMeterById = async (req, res) => {
     const readingData = {
         lastInvoice: lastCutOffReadingRecord?.dateOfReading || null,
         lastReading: (lastCutOffReadingRecord?.KwhReading - secondLastCutOffReadingRecord?.KwhReading) || 0,
+        currentMeterKwhReading: lastReadingRecord?.KwhReading || 0
     };
 
     return res.json({ ...meterData.toObject(), ...readingData });
