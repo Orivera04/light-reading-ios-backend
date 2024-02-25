@@ -37,5 +37,26 @@ MeterSchema.method('toJSON', function() {
   return Object;
 });
 
+// Validations
+const validateBeforeDestroy = async function(record) {
+  const readingExists = await record.model('Reading').findOne({ meter: record._id });
+
+  if (readingExists) {
+    throw new Error('The meter has readings associated.');
+  }
+}
+
+// Events
+
+MeterSchema.pre('deleteOne', async function(next) {
+  try {
+    await validateBeforeDestroy(this);
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 module.exports = model('Meter', MeterSchema);

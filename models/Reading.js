@@ -3,8 +3,7 @@ const Meter = require('../models/Meter');
 
 const ReadingSchema = Schema({
   id: {
-    type: String,
-    required: true
+    type: String
   },
   KwhReading: {
     type: Number,
