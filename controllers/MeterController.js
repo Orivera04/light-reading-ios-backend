@@ -132,7 +132,7 @@ const deleteMeter = async( req, res ) => {
       });
     }
 
-    await Meter.findByIdAndDelete(meterId);
+    await Meter.deleteOne({_id: meterId});
 
     return res.json({
       ok: true,

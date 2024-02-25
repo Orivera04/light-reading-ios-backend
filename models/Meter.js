@@ -33,7 +33,8 @@ const MeterSchema = Schema({
 
 // Validations
 const validateBeforeDestroy = async function(record) {
-  const readingExists = await record.model('Reading').findOne({ meter: record._id });
+  const Reading = require('../models/Reading');
+  const readingExists = await Reading.findOne({ meter: record.getQuery()._id });
 
   if (readingExists) {
     throw new Error('The meter has readings associated.');
