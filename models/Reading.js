@@ -13,7 +13,7 @@ const ReadingSchema = Schema({
     type: Number
   },
   dateOfReading: {
-    type: String,
+    type: Date,
     required: true
   },
   isCutoffDate: {
@@ -95,7 +95,7 @@ ReadingSchema.pre('save', async function(next) {
 });
 
 // Store a new reading and update the meter's current reading
-ReadingSchema.post('save', async function(_, _ , next) {
+ReadingSchema.post('save', async function(next) {
   try {
     const meter = await Meter.findById(this.meter);
     const lastCutOffRecord = await this.model('Reading').findOne({ meter: this.meter, isCutoffDate: true });
