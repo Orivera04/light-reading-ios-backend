@@ -25,7 +25,7 @@ const ReadingSchema = Schema({
     ref: 'Meter',
     required: true
   }
-}, { toJSON: { getters: true, virtuals: true } });
+});
 
 // Indexs
 ReadingSchema.index({ meter: 1, dateOfReading: 1 }, { unique: true });
@@ -77,6 +77,19 @@ const validateBeforeDestroy = async function(record) {
 }
 
 // Events
+
+// Validate before delete
+ReadingSchema.pre('deleteOne', async function(next) {
+  try {
+    await validateBeforeDestroy(this);
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// General validations
 ReadingSchema.pre('validate', async function(next) {
   try {
     await validateAtLeastOneCutoffExists(this);
@@ -129,28 +142,19 @@ ReadingSchema.post('save', async function(_, next) {
   }
 });
 
-ReadingSchema.post('findOneAndUpdate', async function(next) {
+ReadingSchema.post('findOneAndUpdate', async function(_, next) {
   // If the reading is the most recent reading, then update the meter's current reading
   const reading = await this.model.findOne(this.getQuery());
+  const meter = await Meter.findById(reading.meter);
   const lastReading = await this.model.findOne({ meter: reading.meter }).sort({ dateOfReading: -1 });
-  const lastCutOffRecord = await this.model('Reading').findOne({ meter: this.meter, isCutoffDate: true });
+  const lastCutOffRecord = await this.model.findOne({ meter: reading.meter, isCutoffDate: true });
 
   if (reading._id.equals(lastReading._id)) {
-    reading.meter.currentReading = (lastCutOffRecord?.KwhReading) ? reading.KwhReading - lastCutOffRecord.KwhReading : 0;
-    reading.meter.save();
-
-    next();
+    meter.currentReading = (lastCutOffRecord?.KwhReading) ? reading.KwhReading - lastCutOffRecord.KwhReading : 0;
+    meter.save();
   }
-});
 
-ReadingSchema.pre('deleteOne', async function(next) {
-  try {
-    await validateBeforeDestroy(this);
-
-    next();
-  } catch (error) {
-    next(error);
-  }
+  next();
 });
 
 module.exports = model('Reading', ReadingSchema);

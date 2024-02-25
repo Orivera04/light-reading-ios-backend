@@ -32,7 +32,7 @@ const createReading = async (req, res ) => {
   const reading = new Reading(req.body);
 
   try {
-    const storedReading = await reading.save();
+    await reading.save();
 
     return res.json({
       ok: true,
@@ -64,11 +64,11 @@ const updateReading = async (req, res ) => {
       ...req.body
     }
 
-    const updatedReading = await Reading.findByIdAndUpdate(readingId, newReading, { new: true });
+    await Reading.findOneAndUpdate({ _id: readingId }, newReading, { new: true });
 
     return res.json({
       ok: true,
-      reading: updatedReading,
+      message: 'Reading updated successfully.',
       translationKey: "reading_updated_succesfully"
     });
 
