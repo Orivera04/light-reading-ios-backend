@@ -22,8 +22,6 @@ const getMeterById = async (req, res) => {
                                  .select('id name desiredKwhMonthly currentReading tag readings')
                                  .populate('readings', 'KwhReading dateOfReading');
 
-    meterData.id = meterData._id;
-
     const lastCutOffReadingRecord = await Reading.findOne({ meter: id, isCutoffDate: true })
                                                  .sort({ dateOfReading: -1 })
                                                  .select('KwhReading dateOfReading');
@@ -37,6 +35,8 @@ const getMeterById = async (req, res) => {
         lastInvoice: lastCutOffReadingRecord?.dateOfReading || null,
         lastReading: (lastCutOffReadingRecord?.KwhReading - secondLastCutOffReadingRecord?.KwhReading) || 0,
     };
+
+    meterData.id = meterData._id;
 
     return res.json( { ...meterData.toObject(), ...readingData } );
   } catch (error) {
@@ -69,7 +69,7 @@ const updateMeter = async (req, res ) => {
   const userId = req.uid;
 
   try {
-    const meter = await Meter.find({ _id: meterId, user: userId })
+    const meter = await Meter.findOne({ _id: meterId, user: userId })
 
     if (!meter) {
       return res.status(404).json({
