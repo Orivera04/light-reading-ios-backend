@@ -31,6 +31,14 @@ const ReadingSchema = Schema({
 ReadingSchema.index({ meter: 1, dateOfReading: 1 }, { unique: true });
 
 // Validations
+const validateAtLeastOneCutoffExists = async function(record) {
+  const existsCutOffInMonth = await record.model('Reading').findOne({ meter: record.meter, isCutoffDate: true });
+
+  if (!existsCutOffInMonth && !record.isCutoffDate) {
+    throw new Error('You need to have at least one cutoff reading before recording more readings.');
+  }
+}
+
 const validateCutOffNotRepeated = async function(record) {
   const dateOfReading = new Date(record.dateOfReading);
   const firstDayOfMonth = new Date(dateOfReading.getFullYear(), dateOfReading.getMonth(), 1);
@@ -71,6 +79,7 @@ const validateBeforeDestroy = async function(record) {
 // Events
 ReadingSchema.pre('validate', async function(next) {
   try {
+    await validateAtLeastOneCutoffExists(this);
     await validateCutOffNotRepeated(this);
     await validateReadingNotRepeated(this);
     await validateLastReadingBigger(this);
@@ -95,7 +104,7 @@ ReadingSchema.pre('save', async function(next) {
 });
 
 // Store a new reading and update the meter's current reading
-ReadingSchema.post('save', async function(next) {
+ReadingSchema.post('save', async function(_, next) {
   try {
     const meter = await Meter.findById(this.meter);
     const lastCutOffRecord = await this.model('Reading').findOne({ meter: this.meter, isCutoffDate: true });
@@ -103,7 +112,7 @@ ReadingSchema.post('save', async function(next) {
     if (this.isCutoffDate) {
       meter.currentReading = 0
     } else {
-      meter.currentReading = (lastCutOffRecord?.KwhReading) ? this.KwhReading - lastCutOffRecord.KwhReading : 0;
+      meter.currentReading = (lastCutOffRecord?.KwhReading || false) ? this.KwhReading - lastCutOffRecord?.KwhReading : 0;
     }
 
     meter.readings.unshift(this._id);
