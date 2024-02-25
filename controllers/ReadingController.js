@@ -36,7 +36,7 @@ const createReading = async (req, res ) => {
 
     return res.json({
       ok: true,
-      storedReading,
+      message: 'Reading saved successfully.',
       translationKey: "reading_saved_successfully"
     });
 
