@@ -42,7 +42,7 @@ const createReading = async (req, res ) => {
 
   } catch (error) {
     console.log(error);
-    return res.json({ ok: false, error: error.message, translationKey: dehumanizeString(error.message) });
+    return res.json({ ok: false, message: error.message, translationKey: dehumanizeString(error.message) });
   }
 }
 
@@ -74,7 +74,7 @@ const updateReading = async (req, res ) => {
 
   } catch (error) {
     console.log(error);
-    return res.json({ ok: true, error, translationKey: "reading_saved_successfully" });
+    return res.json({ ok: false, message: error.message, translationKey: dehumanizeString(error.message) });
   }
 }
 
@@ -102,8 +102,8 @@ const deleteReading = async( req, res ) => {
     });
   } catch (error) {
       console.log(error);
-      return res.status(500).json({ ok: false, message: 'Please, talk to the administrator.', translationKey: "talk_to_admin" });
-  }
+      return res.json({ ok: false, message: error.message, translationKey: dehumanizeString(error.message) });
+    }
 };
 
 module.exports = {

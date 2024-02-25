@@ -63,7 +63,7 @@ const createMeter = async (req, res ) => {
 
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ ok: false, message: error, translationKey: "talk_to_admin" });
+    return res.json({ ok: false, message: error.message, translationKey: dehumanizeString(error.message) });
   }
 }
 
@@ -104,7 +104,7 @@ const updateMeter = async (req, res ) => {
 
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ ok: false, message: error, translationKey: "talk_to_admin" });
+    return res.json({ ok: false, message: error.message, translationKey: dehumanizeString(error.message) });
   }
 }
 
@@ -140,7 +140,7 @@ const deleteMeter = async( req, res ) => {
     });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ ok: false, message: error, translationKey: "talk_to_admin" });
+    return res.json({ ok: false, message: error.message, translationKey: dehumanizeString(error.message) });
   }
 };
 
