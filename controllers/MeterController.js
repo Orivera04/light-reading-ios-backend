@@ -114,7 +114,7 @@ const deleteMeter = async( req, res ) => {
   const userId = req.uid;
 
   try {
-    const meter = await Meter.find({ _id: meterId, user: userId })
+    const meter = await Meter.findOne({ _id: meterId, user: userId })
 
     if (!meter) {
       return res.status(404).json({
