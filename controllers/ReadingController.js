@@ -50,7 +50,7 @@ const updateReading = async (req, res ) => {
   const readingId = req.params.id;
 
   try {
-    const reading = await Reading.findById( readingId );
+    const reading = await Reading.findById(readingId);
 
     if (!reading) {
       return res.status(404).json({
@@ -64,7 +64,10 @@ const updateReading = async (req, res ) => {
       ...req.body
     }
 
-    await Reading.findOneAndUpdate({ _id: readingId }, newReading, { new: true });
+    reading.set(newReading);
+    await reading.validate();
+
+    await Reading.findOneAndUpdate({ _id: readingId }, newReading, { new: true, runValidators: true });
 
     return res.json({
       ok: true,
@@ -80,7 +83,6 @@ const updateReading = async (req, res ) => {
 
 const deleteReading = async( req, res ) => {
   const readingId = req.params.id;
-  const uid = req.uid;
 
   try {
     const reading = await Reading.findById(readingId);
@@ -93,7 +95,7 @@ const deleteReading = async( req, res ) => {
       });
     }
 
-    await Reading.findByIdAndDelete(readingId);
+    await Reading.deleteOne({_id: readingId});
 
     return res.json({
       ok: true,

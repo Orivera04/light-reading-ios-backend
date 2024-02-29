@@ -52,6 +52,8 @@ const validateCutOffNotRepeated = async function(record) {
 }
 
 const validateReadingNotRepeated = async function(record) {
+  if (record._id != null) { return; }
+
   const dateOfReading = new Date(record.dateOfReading);
   const readingDateExists = await record.model('Reading').findOne({ meter: record.meter, dateOfReading: dateOfReading });
 
@@ -61,15 +63,19 @@ const validateReadingNotRepeated = async function(record) {
 }
 
 const validateLastReadingBigger = async function(record) {
-  const lastReading = await record.model('Reading').findOne({ meter: record.meter }).sort({ dateOfReading: -1 });
+  const lastReading = await record.model('Reading').findOne({ meter: record.meter, _id: { $ne: record._id } })
+                                  .sort({ dateOfReading: -1 });
 
   if (lastReading && record.KwhReading < lastReading.KwhReading) {
     throw new Error('The reading is less than the last reading.');
   }
 }
 
-const validateBeforeDestroy = async function(record) {
-  const lastReading = await record.model('Reading').findOne({ meter: record.meter }).sort({ dateOfReading: -1 });
+const validateBeforeDestroy = async function(query) {
+  const Reading = require('../models/Reading');
+  const record = await Reading.findOne(query);
+
+  const lastReading = await Reading.findOne({ meter: record.meter }).sort({ dateOfReading: -1 });
 
   if (!lastReading._id.equals(record._id)) {
     throw new Error('You can only delete the last reading.');
@@ -89,7 +95,7 @@ ReadingSchema.pre('deleteOne', async function(next) {
   }
 });
 
-// General validations
+// General validations on create new
 ReadingSchema.pre('validate', async function(next) {
   try {
     await validateAtLeastOneCutoffExists(this);
@@ -142,8 +148,8 @@ ReadingSchema.post('save', async function(_, next) {
   }
 });
 
+// If the reading is the most recent reading, then update the meter's current reading
 ReadingSchema.post('findOneAndUpdate', async function(_, next) {
-  // If the reading is the most recent reading, then update the meter's current reading
   const reading = await this.model.findOne(this.getQuery());
   const meter = await Meter.findById(reading.meter);
   const lastReading = await this.model.findOne({ meter: reading.meter }).sort({ dateOfReading: -1 });
