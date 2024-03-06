@@ -25,7 +25,7 @@ const ReadingSchema = Schema({
     ref: 'Meter',
     required: true
   }
-});
+}, { timestamps: true });
 
 // Indexs
 ReadingSchema.index({ meter: 1, dateOfReading: 1 }, { unique: true });
