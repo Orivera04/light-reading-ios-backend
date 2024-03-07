@@ -29,7 +29,7 @@ const MeterSchema = Schema({
     ref: 'User',
     required: true
   }
-});
+}, { timestamps: true });
 
 // Validations
 const validateBeforeDestroy = async function(record) {
